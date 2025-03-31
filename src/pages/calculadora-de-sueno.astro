@@ -1,0 +1,152 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-sueno';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Cuánto dura un ciclo de sueño?',
+    answer: 'Un ciclo de sueño completo dura aproximadamente 90 minutos. Durante este tiempo, pasamos por diferentes etapas del sueño, desde el sueño ligero hasta el sueño profundo y el sueño REM.'
+  },
+  {
+    question: '¿Cuántos ciclos de sueño necesito?',
+    answer: 'La mayoría de los adultos necesitan entre 5 y 6 ciclos de sueño por noche, lo que equivale a 7.5-9 horas de sueño. Sin embargo, esto puede variar según la persona.'
+  },
+  {
+    question: '¿Por qué es importante despertar al final de un ciclo?',
+    answer: 'Despertar al final de un ciclo de sueño te ayuda a sentirte más descansado y alerta, ya que no interrumpes una fase profunda del sueño.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Sueño" 
+  description="Calcula la mejor hora para despertar según tus ciclos de sueño. Optimiza tu descanso y despierta más descansado."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Salud y Bienestar"
+      categoryHref="/#salud"
+      currentTitle="Calculadora de Sueño"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Sueño</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta calculadora te ayuda a determinar la mejor hora para despertar basándose en los ciclos naturales del sueño.
+      Cada ciclo dura aproximadamente 90 minutos, y despertar al final de un ciclo te ayudará a sentirte más descansado.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="sleepCalculator" class="space-y-6">
+        <div>
+          <label for="bedtime" class="block text-sm font-medium text-gray-700 mb-2">
+            Hora de acostarse
+          </label>
+          <input
+            type="time"
+            id="bedtime"
+            name="bedtime"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="cycles" class="block text-sm font-medium text-gray-700 mb-2">
+            Ciclos de sueño deseados
+          </label>
+          <select
+            id="cycles"
+            name="cycles"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          >
+            <option value="4">4 ciclos (6 horas)</option>
+            <option value="5">5 ciclos (7.5 horas)</option>
+            <option value="6" selected>6 ciclos (9 horas)</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular
+        </button>
+      </form>
+
+      <div id="results" class="mt-6 hidden">
+        <h2 class="text-xl font-semibold mb-3">Hora ideal para despertar:</h2>
+        <p id="wakeTime" class="text-2xl font-bold text-primary"></p>
+      </div>
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('sleepCalculator');
+  const results = document.getElementById('results');
+  const wakeTimeElement = document.getElementById('wakeTime');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const bedtimeInput = document.getElementById('bedtime') as HTMLInputElement;
+    const cyclesInput = document.getElementById('cycles') as HTMLSelectElement;
+    
+    const bedtime = new Date();
+    const [hours, minutes] = bedtimeInput.value.split(':');
+    
+    bedtime.setHours(parseInt(hours), parseInt(minutes));
+    
+    // Add 15 minutes to fall asleep
+    bedtime.setMinutes(bedtime.getMinutes() + 15);
+    
+    // Calculate wake time (90 minutes per cycle)
+    const cycles = parseInt(cyclesInput.value);
+    const wakeTime = new Date(bedtime.getTime() + (cycles * 90 * 60 * 1000));
+    
+    if (results && wakeTimeElement) {
+      results.classList.remove('hidden');
+      wakeTimeElement.textContent = wakeTime.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  });
+</script>

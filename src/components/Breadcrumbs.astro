@@ -1,0 +1,60 @@
+---
+interface Props {
+  categoryTitle: string;
+  categoryHref: string;
+  currentTitle: string;
+}
+
+const { categoryTitle, categoryHref, currentTitle } = Astro.props;
+
+// Base URL for structured data
+const baseUrl = 'https://calculadorasfaciles.com';
+
+// Structured data for breadcrumbs
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": baseUrl
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": categoryTitle,
+      "item": `${baseUrl}${categoryHref}`
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": currentTitle,
+      "item": `${baseUrl}${Astro.url.pathname}`
+    }
+  ]
+};
+---
+
+<nav aria-label="Breadcrumb" class="mb-6">
+  <ol class="flex items-center space-x-2 text-sm text-gray-600">
+    <li>
+      <a href="/" class="hover:text-gray-900 hover:underline">Inicio</a>
+    </li>
+    <li>
+      <span class="mx-2">›</span>
+    </li>
+    <li>
+      <a href={categoryHref} class="hover:text-gray-900 hover:underline">{categoryTitle}</a>
+    </li>
+    <li>
+      <span class="mx-2">›</span>
+    </li>
+    <li>
+      <span class="text-gray-900" aria-current="page">{currentTitle}</span>
+    </li>
+  </ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />

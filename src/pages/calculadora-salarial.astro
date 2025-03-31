@@ -1,0 +1,242 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-salarial';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Qué se descuenta del salario en Costa Rica?',
+    answer: 'En Costa Rica, las deducciones principales incluyen el aporte al seguro social (CCSS, aproximadamente 10.5%), el impuesto sobre la renta cuando aplica, y otras deducciones como asociaciones solidaristas o préstamos si los hubiera.'
+  },
+  {
+    question: '¿Cuáles son las deducciones típicas en Colombia?',
+    answer: 'En Colombia, las deducciones básicas incluyen aportes a salud (4%), pensión (4%), y retención en la fuente cuando aplica. El total suele estar entre 8-12% del salario bruto, sin contar deducciones adicionales.'
+  },
+  {
+    question: '¿Es esta una estimación precisa?',
+    answer: 'Esta calculadora ofrece una aproximación general basada en las deducciones más comunes. Para un cálculo exacto, consulta con un profesional contable ya que pueden existir variaciones según tu situación específica y cambios en la legislación.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora Salarial Costa Rica y Colombia" 
+  description="Calcula tu salario neto mensual estimado en Costa Rica o Colombia. Incluye deducciones aproximadas y aportes obligatorios."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Trabajo y Finanzas"
+      categoryHref="/#finanzas"
+      currentTitle="Calculadora Salarial"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora Salarial (Costa Rica y Colombia)</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta herramienta te permite estimar tu salario neto mensual en Costa Rica o Colombia,
+      tomando en cuenta deducciones típicas. Ideal para empleados que desean conocer cuánto
+      recibirán después de impuestos y aportes obligatorios.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="salaryCalculator" class="space-y-6">
+        <div>
+          <label for="country" class="block text-sm font-medium text-gray-700 mb-2">
+            País
+          </label>
+          <select
+            id="country"
+            name="country"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          >
+            <option value="">Selecciona un país</option>
+            <option value="CR">Costa Rica</option>
+            <option value="CO">Colombia</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="grossSalary" class="block text-sm font-medium text-gray-700 mb-2">
+            Salario bruto mensual
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" id="currencySymbol">$</span>
+            <input
+              type="number"
+              id="grossSalary"
+              name="grossSalary"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <div id="crDeductions" class="hidden">
+          <label for="optionalDeductions" class="block text-sm font-medium text-gray-700 mb-2">
+            Deducciones opcionales
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₡</span>
+            <input
+              type="number"
+              id="optionalDeductions"
+              name="optionalDeductions"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <div id="coDeductions" class="hidden">
+          <label for="deductionPercentage" class="block text-sm font-medium text-gray-700 mb-2">
+            Porcentaje aproximado de deducciones
+          </label>
+          <div class="relative">
+            <input
+              type="number"
+              id="deductionPercentage"
+              name="deductionPercentage"
+              min="8"
+              max="12"
+              value="8"
+              class="w-full pr-8 pl-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular salario neto
+        </button>
+      </form>
+
+      <div id="results" class="mt-6 hidden">
+        <h2 class="text-xl font-semibold mb-4">Resultados:</h2>
+        <div class="space-y-3">
+          <p class="text-gray-700">
+            Total deducciones: <span id="totalDeductions" class="font-bold text-primary"></span>
+          </p>
+          <p class="text-gray-700">
+            Porcentaje de retención: <span id="retentionRate" class="font-bold text-primary"></span>
+          </p>
+          <p class="text-gray-700">
+            Salario neto estimado: <span id="netSalary" class="text-2xl font-bold text-primary"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('salaryCalculator');
+  const countrySelect = document.getElementById('country') as HTMLSelectElement;
+  const crDeductions = document.getElementById('crDeductions');
+  const coDeductions = document.getElementById('coDeductions');
+  const currencySymbol = document.getElementById('currencySymbol');
+  const results = document.getElementById('results');
+  const totalDeductionsElement = document.getElementById('totalDeductions');
+  const retentionRateElement = document.getElementById('retentionRate');
+  const netSalaryElement = document.getElementById('netSalary');
+
+  countrySelect?.addEventListener('change', () => {
+    const country = countrySelect.value;
+    
+    if (crDeductions && coDeductions && currencySymbol) {
+      if (country === 'CR') {
+        crDeductions.classList.remove('hidden');
+        coDeductions.classList.add('hidden');
+        currencySymbol.textContent = '₡';
+      } else if (country === 'CO') {
+        crDeductions.classList.add('hidden');
+        coDeductions.classList.remove('hidden');
+        currencySymbol.textContent = '$';
+      } else {
+        crDeductions.classList.add('hidden');
+        coDeductions.classList.add('hidden');
+        currencySymbol.textContent = '$';
+      }
+    }
+  });
+
+  function calculateCostaRicaSalary(grossSalary: number, optionalDeductions: number = 0) {
+    const ccssPct = 0.105; // 10.5% CCSS
+    const ccssDeduction = grossSalary * ccssPct;
+    const totalDeductions = ccssDeduction + optionalDeductions;
+    const netSalary = grossSalary - totalDeductions;
+    const retentionRate = (totalDeductions / grossSalary) * 100;
+    
+    return {
+      totalDeductions,
+      retentionRate,
+      netSalary,
+      currency: '₡'
+    };
+  }
+
+  function calculateColombiaSalary(grossSalary: number, deductionPct: number) {
+    const totalDeductions = grossSalary * (deductionPct / 100);
+    const netSalary = grossSalary - totalDeductions;
+    
+    return {
+      totalDeductions,
+      retentionRate: deductionPct,
+      netSalary,
+      currency: '$'
+    };
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const grossSalaryInput = document.getElementById('grossSalary') as HTMLInputElement;
+    const optionalDeductionsInput = document.getElementById('optionalDeductions') as HTMLInputElement;
+    const deductionPercentageInput = document.getElementById('deductionPercentage') as HTMLInputElement;
+    
+    const country = countrySelect.value;
+    const grossSalary = parseFloat(grossSalaryInput.value);
+    
+    let result;
+    
+    if (country === 'CR') {
+      const optionalDeductions = optionalDeductionsInput.value ? parseFloat(optionalDeductionsInput.value) : 0;
+      result = calculateCostaRicaSalary(grossSalary, optionalDeductions);
+    } else if (country === 'CO') {
+      const deductionPct = parseFloat(deductionPercentageInput.value);
+      result = calculateColombiaSalary(grossSalary, deductionPct);
+    }
+    
+    if (result && results && totalDeductionsElement && retentionRateElement && netSalaryElement) {
+      results.classList.remove('hidden');
+      totalDeductionsElement.textContent = `${result.currency}${result.totalDeductions.toFixed(2)}`;
+      retentionRateElement.textContent = `${result.retentionRate.toFixed(2)}%`;
+      netSalaryElement.textContent = `${result.currency}${result.netSalary.toFixed(2)}`;
+    }
+  });
+</script>

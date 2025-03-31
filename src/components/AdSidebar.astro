@@ -1,0 +1,54 @@
+---
+interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<aside id="sidebarAdWrapper" class:list={['sidebar-ad', className]}>
+  <p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Publicidad</p>
+  <div class="bg-white shadow-md rounded-lg p-4 w-full">
+    <div class="min-h-[400px] max-h-[600px] flex items-center justify-center">
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <ins class="adsbygoogle"
+           style="display:block; min-height:280px;"
+           data-ad-client="ca-pub-XXXXXXX"
+           data-ad-slot="1234567890"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .sidebar-ad {
+    width: 300px;
+    min-width: 250px;
+    margin-left: auto;
+  }
+
+  /* Hide sidebar ad on mobile */
+  @media (max-width: 1024px) {
+    .sidebar-ad {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Initialize ad after the component mounts
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }, 100);
+  });
+
+  // Check if ad loaded and hide wrapper if not
+  setTimeout(() => {
+    const ad = document.querySelector('.adsbygoogle iframe');
+    if (!ad) {
+      document.getElementById('sidebarAdWrapper')?.classList.add('hidden');
+    }
+  }, 2000); // wait for ad to try loading
+</script>

@@ -1,0 +1,115 @@
+---
+import AdSidebar from '../components/AdSidebar.astro';
+import MobileBottomAd from '../components/MobileBottomAd.astro';
+import Analytics from '../components/Analytics.astro';
+import CookieConsent from '../components/CookieConsent.astro';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="description" content={description} />
+  <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title} | Calculadoras Fáciles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <Analytics />
+
+  <!-- SEO Structured Data: Homepage only -->
+  {Astro.url.pathname === '/' && (
+    <script type="application/ld+json">
+      {JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Calculadoras Online Gratuitas",
+        "description": "Explora calculadoras online gratuitas para matemáticas, finanzas, embarazo y salud. Herramientas simples para tus necesidades diarias.",
+        "url": "https://calculadorasfaciles.com/"
+      })}
+    </script>
+  )}
+
+  <link rel="canonical" href="https://calculadorasfaciles.com/" />
+</head>
+
+<body class="min-h-screen bg-white">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <header class="bg-gradient-to-r from-primary to-secondary text-white py-3 px-6">
+    <div class="container mx-auto">
+      <div class="flex items-center space-x-2">
+        <a href="/" class="text-xl font-bold text-white">Calculadoras Fáciles</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container mx-auto px-4 py-8">
+    <div class="calculator-page">
+      <main class="calculator-content">
+        <slot />
+      </main>
+      <AdSidebar />
+    </div>
+  </div>
+
+  <footer class="bg-gray-100 py-6 mt-12">
+    <div class="container mx-auto px-4 text-center text-gray-600">
+      <p>&copy; {new Date().getFullYear()} Calculadoras Fáciles - Todas las calculadoras que necesitas</p>
+      <p class="mt-2 text-sm">
+        <a href="/politica-de-privacidad" class="text-blue-600 hover:underline">Política de Privacidad</a> ·
+        <a href="/politica-de-cookies" class="text-blue-600 hover:underline">Política de Cookies</a> ·
+        <a href="/terminos-y-condiciones" class="text-blue-600 hover:underline">Términos y Condiciones</a>
+      </p>
+    </div>
+  </footer>
+
+  <MobileBottomAd />
+  <CookieConsent />
+</body>
+</html>
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .calculator-page {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .calculator-content {
+    flex: 1;
+    min-width: 0; /* Prevent flex item from overflowing */
+  }
+
+  /* Stack layout on mobile */
+  @media (max-width: 1024px) {
+    .calculator-page {
+      flex-direction: column;
+    }
+
+    /* Add padding to prevent content from being hidden behind mobile ad */
+    body {
+      padding-bottom: 124px;
+    }
+  }
+</style>

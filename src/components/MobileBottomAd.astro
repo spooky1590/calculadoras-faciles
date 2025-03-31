@@ -1,0 +1,55 @@
+---
+interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<div class:list={['mobile-bottom-ad', className]}>
+  <div class="ad-container">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXX"
+         data-ad-slot="1234567890"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+</div>
+
+<style>
+  .mobile-bottom-ad {
+    display: none;
+  }
+
+  .ad-container {
+    min-height: 100px;
+    background: #f9fafb;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  @media (max-width: 1024px) {
+    .mobile-bottom-ad {
+      display: block;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background: white;
+      padding: 12px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+    }
+  }
+</style>
+
+<script>
+  // Initialize ad after the component mounts
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }, 100);
+  });
+</script>

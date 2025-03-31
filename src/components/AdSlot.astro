@@ -1,0 +1,14 @@
+---
+interface Props {
+  position: 'top' | 'middle' | 'bottom';
+}
+
+const { position } = Astro.props;
+---
+
+<div class="ad-slot my-8 text-center" data-position={position}>
+  <!-- ADSENSE SLOT -->
+  <div class="bg-gray-100 p-4 rounded-lg">
+    <p class="text-gray-400">Espacio publicitario</p>
+  </div>
+</div>

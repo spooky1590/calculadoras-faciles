@@ -1,0 +1,88 @@
+---
+---
+
+<div id="cookie-banner" class="cookie-banner hidden">
+  <p>Este sitio utiliza cookies para mejorar tu experiencia. Al continuar, aceptas el uso de cookies.</p>
+  <div class="mt-4 flex justify-center gap-4">
+    <button id="accept-cookies" class="accept">Aceptar</button>
+    <a href="/politica-de-cookies" class="text-blue-600 hover:text-blue-800">Más información</a>
+  </div>
+</div>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #f1f5f9;
+    color: #1f2937;
+    padding: 1rem;
+    text-align: center;
+    z-index: 9999;
+    font-size: 14px;
+  }
+
+  .cookie-banner button {
+    margin: 0 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .cookie-banner a {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .cookie-banner {
+      padding: 1rem 0.5rem;
+    }
+    
+    .cookie-banner button {
+      margin: 0 0.25rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
+
+  /* Animation */
+  .cookie-banner {
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .cookie-banner.show {
+    transform: translateY(0);
+  }
+</style>
+
+<script>
+  const banner = document.getElementById('cookie-banner');
+  const acceptButton = document.getElementById('accept-cookies');
+
+  // Check if consent was previously given
+  const hasConsent = localStorage.getItem('cookieConsent') === 'true';
+
+  // Show banner if no consent was given
+  if (!hasConsent && banner) {
+    banner.classList.remove('hidden');
+    setTimeout(() => {
+      banner.classList.add('show');
+    }, 100);
+  }
+
+  // Handle accept button click
+  acceptButton?.addEventListener('click', () => {
+    localStorage.setItem('cookieConsent', 'true');
+    if (banner) {
+      banner.classList.remove('show');
+      setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 300);
+    }
+  });
+</script>

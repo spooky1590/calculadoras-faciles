@@ -1,0 +1,76 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AdSlot from '../components/AdSlot.astro';
+
+const currentDate = new Date().toLocaleDateString('es-ES', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<Layout 
+  title="Política de Privacidad | CalculadorasFaciles.com"
+  description="Conoce cómo protegemos y utilizamos tus datos en CalculadorasFaciles.com. Información sobre recopilación de datos y derechos del usuario."
+>
+  <article class="max-w-3xl mx-auto px-4">
+    <h1 class="text-4xl font-bold mb-8">Política de Privacidad</h1>
+
+    <div class="prose prose-lg">
+      <p class="text-lg text-gray-700 mb-8">
+        En CalculadorasFaciles.com, respetamos tu privacidad. Esta política explica qué datos 
+        recopilamos, cómo los usamos y cómo puedes ejercer tus derechos.
+      </p>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Información que recopilamos</h2>
+        <p class="text-lg text-gray-700">
+          Recopilamos datos de uso del sitio web, como páginas visitadas, tiempo en el sitio 
+          y ubicación aproximada mediante herramientas como Google Analytics y Google Tag Manager.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Uso de la información</h2>
+        <p class="text-lg text-gray-700">
+          La información recopilada se utiliza para mejorar la experiencia del usuario y 
+          analizar el rendimiento del sitio.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">3. Cookies</h2>
+        <p class="text-lg text-gray-700">
+          Consulta nuestra <a href="/politica-de-cookies" class="text-blue-600 hover:underline">Política de Cookies</a> 
+          para más detalles sobre el uso de cookies.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">4. Derechos del usuario</h2>
+        <p class="text-lg text-gray-700">
+          Si estás en la Unión Europea u otras regiones con leyes de protección de datos, 
+          tienes derecho a acceder, modificar o eliminar tu información. Para solicitudes 
+          relacionadas, contáctanos a través de nuestra página de contacto.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">5. Terceros</h2>
+        <p class="text-lg text-gray-700">
+          Podemos compartir información con terceros como Google para fines de análisis o publicidad.
+        </p>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Cambios en esta política</h2>
+        <p class="text-lg text-gray-700">
+          Nos reservamos el derecho de actualizar esta política en cualquier momento. 
+          Última actualización: {currentDate}
+        </p>
+      </section>
+    </div>
+
+    <AdSlot position="bottom" />
+  </article>
+</Layout>

@@ -1,0 +1,219 @@
+---
+interface Props {
+  title?: string;
+  showChart?: boolean;
+}
+
+const { 
+  title = "Resultados",
+  showChart = false 
+} = Astro.props;
+---
+
+<div id="calculator-output" class="mt-6 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-8">
+    <div id="text-results" class="space-y-6">
+      <!-- Dynamic results will be inserted here via JavaScript -->
+    </div>
+    
+    {showChart && (
+      <div class="space-y-8 mt-8">
+        <!-- Pie chart -->
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="aspect-square">
+            <canvas id="pieChart" class="w-full h-full"></canvas>
+          </div>
+          <div id="breakdown" class="space-y-4">
+            <!-- Breakdown details will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Bar chart -->
+        <div class="mt-8">
+          <canvas id="barChart" class="w-full" height="300"></canvas>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+<script is:inline>
+  // Load Chart.js from CDN
+  if (!window.Chart) {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+
+  let currentPieChart = null;
+  let currentBarChart = null;
+
+  function showResults() {
+    const output = document.getElementById('calculator-output');
+    if (output) output.classList.remove('hidden');
+  }
+
+  function setTextResult(html) {
+    const results = document.getElementById('text-results');
+    if (results) results.innerHTML = html;
+    showResults();
+  }
+
+  function renderCharts(data) {
+    const { labels, values, colors } = data;
+    
+    // Calculate percentages for pie chart
+    const total = values.reduce((sum, value) => sum + value, 0);
+    const percentages = values.map(value => ((value / total) * 100).toFixed(1));
+    
+    // Render pie chart
+    const pieCtx = document.getElementById('pieChart');
+    if (pieCtx && currentPieChart) {
+      currentPieChart.destroy();
+    }
+    if (pieCtx) {
+      currentPieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: labels.map((label, i) => `${label} (${percentages[i]}%)`),
+          datasets: [{
+            data: values,
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            borderWidth: 2,
+            hoverOffset: 20
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                font: {
+                  size: 14
+                },
+                generateLabels: (chart) => {
+                  const data = chart.data;
+                  if (data.labels.length && data.datasets.length) {
+                    return data.labels.map((label, i) => ({
+                      text: label,
+                      fillStyle: data.datasets[0].backgroundColor[i],
+                      strokeStyle: data.datasets[0].borderColor[i],
+                      lineWidth: 2,
+                      hidden: false,
+                      index: i
+                    }));
+                  }
+                  return [];
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const value = context.raw;
+                  const percentage = percentages[context.dataIndex];
+                  return `${context.label.split(' (')[0]}: ${new Intl.NumberFormat('es-ES', {
+                    style: 'currency',
+                    currency: 'EUR'
+                  }).format(value)} (${percentage}%)`;
+                }
+              }
+            }
+          },
+          layout: {
+            padding: 20
+          },
+          elements: {
+            arc: {
+              borderWidth: 2,
+              borderColor: '#fff'
+            }
+          }
+        }
+      });
+    }
+
+    // Render bar chart
+    const barCtx = document.getElementById('barChart');
+    if (barCtx && currentBarChart) {
+      currentBarChart.destroy();
+    }
+    if (barCtx) {
+      currentBarChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: data.yearLabels,
+          datasets: data.yearlyData.map((dataset, index) => ({
+            label: dataset.label,
+            data: dataset.data,
+            backgroundColor: colors.background[index],
+            borderColor: colors.border[index],
+            borderWidth: 1,
+            stack: 'Stack 0'
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true,
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                callback: value => new Intl.NumberFormat('es-ES', {
+                  style: 'currency',
+                  currency: 'EUR',
+                  maximumFractionDigits: 0
+                }).format(value)
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                font: {
+                  size: 14
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // Export functions to window for global access
+  window.calculatorOutput = {
+    show: showResults,
+    setText: setTextResult,
+    renderCharts
+  };
+</script>
+
+<style>
+  #calculator-output {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: slideIn 0.3s ease forwards;
+  }
+
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

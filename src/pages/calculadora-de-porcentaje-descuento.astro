@@ -1,0 +1,152 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-porcentaje-descuento';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Cómo se calcula el porcentaje de descuento?',
+    answer: 'El porcentaje de descuento se calcula restando el precio con descuento del precio original, dividiendo el resultado entre el precio original y multiplicando por 100. Por ejemplo: si un producto costaba 100€ y ahora cuesta 80€, el descuento es del 20%.'
+  },
+  {
+    question: '¿Para qué sirve conocer el porcentaje de descuento?',
+    answer: 'Conocer el porcentaje de descuento te permite comparar diferentes ofertas de manera más efectiva, independientemente del precio original del producto. También ayuda a identificar las mejores oportunidades de ahorro.'
+  },
+  {
+    question: '¿Puedo usar esta herramienta para promociones múltiples?',
+    answer: 'Esta calculadora está diseñada para calcular el porcentaje de descuento entre el precio original y el precio final. Si hay múltiples descuentos aplicados, solo necesitas introducir el precio original y el precio final para conocer el porcentaje total de descuento.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Porcentaje de Descuento" 
+  description="Calcula el porcentaje de descuento aplicado entre el precio original y el precio final. Útil para comparar ofertas y promociones."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Matemáticas y Educación"
+      categoryHref="/#matematicas"
+      currentTitle="Calculadora de Porcentaje de Descuento"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Porcentaje de Descuento</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta calculadora te ayuda a determinar qué porcentaje de descuento se ha aplicado a un precio rebajado.
+      Simplemente ingresa el precio original y el precio con descuento para conocer el porcentaje exacto de la rebaja.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="discountPercentageCalculator" class="space-y-6">
+        <div>
+          <label for="originalPrice" class="block text-sm font-medium text-gray-700 mb-2">
+            Precio original
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+            <input
+              type="number"
+              id="originalPrice"
+              name="originalPrice"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="discountedPrice" class="block text-sm font-medium text-gray-700 mb-2">
+            Precio con descuento
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+            <input
+              type="number"
+              id="discountedPrice"
+              name="discountedPrice"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular porcentaje de descuento
+        </button>
+      </form>
+
+      <div id="results" class="mt-6 hidden">
+        <h2 class="text-xl font-semibold mb-4">Resultado:</h2>
+        <p class="text-gray-700">
+          Porcentaje de descuento: <span id="discountPercentage" class="text-2xl font-bold text-primary"></span>
+        </p>
+      </div>
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('discountPercentageCalculator');
+  const results = document.getElementById('results');
+  const discountPercentageElement = document.getElementById('discountPercentage');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const originalPriceInput = document.getElementById('originalPrice') as HTMLInputElement;
+    const discountedPriceInput = document.getElementById('discountedPrice') as HTMLInputElement;
+    
+    const originalPrice = parseFloat(originalPriceInput.value);
+    const discountedPrice = parseFloat(discountedPriceInput.value);
+    
+    const discountAmount = originalPrice - discountedPrice;
+    const discountPercentage = (discountAmount / originalPrice) * 100;
+    
+    if (results && discountPercentageElement) {
+      results.classList.remove('hidden');
+      discountPercentageElement.textContent = `${discountPercentage.toFixed(2)}%`;
+    }
+  });
+</script>

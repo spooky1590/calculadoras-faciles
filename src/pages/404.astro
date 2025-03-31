@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SearchBar from '../components/SearchBar.astro';
+
+---
+
+<Layout 
+  title="Página no encontrada"
+  description="Esta página no existe o ha sido movida."
+>
+  <div class="max-w-xl mx-auto px-4 py-12 text-center">
+    <h1 class="text-3xl font-bold mb-4">404 - Página no encontrada</h1>
+    
+    <p class="text-gray-600 mb-6">
+      Lo sentimos, no pudimos encontrar la calculadora que estás buscando.
+    </p>
+
+    <div class="mb-8">
+      <a 
+        href="/" 
+        class="inline-block bg-primary text-white px-4 py-2 rounded hover:bg-secondary transition"
+      >
+        Volver al inicio
+      </a>
+    </div>
+
+    <div class="max-w-sm mx-auto">
+      <p class="text-gray-600 mb-4">¿Buscas una calculadora específica?</p>
+      <SearchBar />
+    </div>
+  </div>
+</Layout>

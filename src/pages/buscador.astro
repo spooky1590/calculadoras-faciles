@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { categories } from '../data/categories';
+import SearchBar from '../components/SearchBar.astro';
+
+// Get search query from URL
+const query = Astro.url.searchParams.get('q')?.toLowerCase() || '';
+
+// Get all calculators from all categories
+const allCalculators = categories.flatMap(category => 
+  category.calculators.map(calc => ({
+    ...calc,
+    category: {
+      title: category.title,
+      id: category.id
+    }
+  }))
+);
+
+// Filter calculators based on search query
+const searchResults = query ? allCalculators.filter(calc => 
+  calc.title.toLowerCase().includes(query) || 
+  calc.description.toLowerCase().includes(query)
+) : [];
+
+// Function to highlight matched text
+function highlightMatch(text: string, query: string) {
+  if (!query) return text;
+  
+  const regex = new RegExp(`(${query})`, 'gi');
+  return text.replace(regex, '<mark class="bg-yellow-100 rounded px-1">$1</mark>');
+}
+---
+
+<Layout 
+  title={`Buscar Calculadoras | CalculadorasFaciles.com`}
+  description="Encuentra la calculadora que necesitas entre nuestra colección de herramientas gratuitas."
+>
+  <div class="max-w-4xl mx-auto px-4">
+    <h1 class="text-4xl font-bold mb-8">Resultados de búsqueda</h1>
+
+    <div class="mb-8">
+      <SearchBar />
+    </div>
+
+    {query && (
+      <p class="text-lg text-gray-600 mb-6">
+        {searchResults.length > 0 
+          ? `Se encontraron ${searchResults.length} calculadora${searchResults.length === 1 ? '' : 's'} para "${query}"`
+          : `No se encontraron calculadoras para "${query}"`
+        }
+      </p>
+    )}
+
+    {searchResults.length > 0 ? (
+      <div class="grid gap-6 md:grid-cols-2">
+        {searchResults.map(calc => (
+          <a 
+            href={calc.href}
+            class="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          >
+            <div class="text-sm text-primary mb-2">{calc.category.title}</div>
+            <h2 
+              class="text-xl font-semibold text-gray-900 mb-2"
+              set:html={highlightMatch(calc.title, query)}
+            />
+            <p 
+              class="text-gray-600"
+              set:html={highlightMatch(calc.description, query)}
+            />
+          </a>
+        ))}
+      </div>
+    ) : query ? (
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">No se encontraron calculadoras para esa búsqueda.</p>
+        <p class="text-gray-600">
+          Sugerencias:
+          <ul class="list-disc list-inside mt-2 space-y-1">
+            <li>Revisa que las palabras estén bien escritas</li>
+            <li>Intenta usar términos más generales</li>
+            <li>Prueba con palabras clave diferentes</li>
+          </ul>
+        </p>
+      </div>
+    ) : (
+      <div class="text-center py-12">
+        <p class="text-gray-500">Ingresa un término de búsqueda para encontrar calculadoras.</p>
+      </div>
+    )}
+
+    {/* Add structured data for search results */}
+    {searchResults.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SearchResultsPage",
+        "mainEntity": {
+          "@type": "ItemList",
+          "itemListElement": searchResults.map((calc, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "url": `https://calculadorasfaciles.com${calc.href}`,
+            "name": calc.title,
+            "description": calc.description
+          }))
+        }
+      })} />
+    )}
+  </div>
+</Layout>
+
+<style>
+  mark {
+    color: inherit;
+  }
+</style>

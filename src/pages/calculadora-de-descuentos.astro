@@ -1,0 +1,179 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorOutput from '../components/CalculatorOutput.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-descuentos';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Cómo se calcula un descuento?',
+    answer: 'Para calcular un descuento, primero se multiplica el precio original por el porcentaje de descuento (dividido entre 100) para obtener la cantidad a descontar. Luego, se resta esta cantidad del precio original para obtener el precio final.'
+  },
+  {
+    question: '¿Qué significa porcentaje de descuento?',
+    answer: 'El porcentaje de descuento representa la proporción del precio original que se reducirá. Por ejemplo, un 20% de descuento significa que pagarás el 80% del precio original.'
+  },
+  {
+    question: '¿Puedo usar esta calculadora para varias promociones?',
+    answer: 'Sí, puedes usar esta calculadora para cualquier tipo de descuento, ya sea en rebajas, promociones especiales o cupones de descuento. Solo necesitas el precio original y el porcentaje de descuento.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Descuentos" 
+  description="Calcula fácilmente el precio final tras aplicar un porcentaje de descuento. Ideal para compras, promociones y rebajas."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Matemáticas y Educación"
+      categoryHref="/#matematicas"
+      currentTitle="Calculadora de Descuentos"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Descuentos</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta calculadora te ayuda a determinar el precio final de un producto después de aplicar un descuento.
+      Simplemente ingresa el precio original y el porcentaje de descuento para obtener el monto ahorrado y el precio final.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="discountCalculator" class="space-y-6">
+        <div>
+          <label for="originalPrice" class="block text-sm font-medium text-gray-700 mb-2">
+            Precio original
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+            <input
+              type="number"
+              id="originalPrice"
+              name="originalPrice"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="discountPercentage" class="block text-sm font-medium text-gray-700 mb-2">
+            Porcentaje de descuento
+          </label>
+          <div class="relative">
+            <input
+              type="number"
+              id="discountPercentage"
+              name="discountPercentage"
+              min="0"
+              max="100"
+              class="w-full pr-8 pl-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular descuento
+        </button>
+      </form>
+
+      <CalculatorOutput showChart={true} />
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('discountCalculator');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const originalPriceInput = document.getElementById('originalPrice') as HTMLInputElement;
+    const discountPercentageInput = document.getElementById('discountPercentage') as HTMLInputElement;
+    
+    const originalPrice = parseFloat(originalPriceInput.value);
+    const discountPercentage = parseFloat(discountPercentageInput.value);
+    
+    const discountAmount = (originalPrice * discountPercentage) / 100;
+    const finalPrice = originalPrice - discountAmount;
+    
+    // Update text results
+    window.calculatorOutput.setText(`
+      <div class="space-y-3">
+        <p class="text-gray-700">
+          Precio original: <span class="font-bold text-primary">${originalPrice.toFixed(2)} €</span>
+        </p>
+        <p class="text-gray-700">
+          Porcentaje de descuento: <span class="font-bold text-primary">${discountPercentage.toFixed(2)}%</span>
+        </p>
+        <p class="text-gray-700">
+          Cantidad descontada: <span class="font-bold text-primary">${discountAmount.toFixed(2)} €</span>
+        </p>
+        <p class="text-gray-700">
+          Precio final: <span class="text-2xl font-bold text-primary">${finalPrice.toFixed(2)} €</span>
+        </p>
+      </div>
+    `);
+
+    // Render bar chart
+    window.calculatorOutput.renderBarChart(
+      ['Precio Original', 'Descuento', 'Precio Final'],
+      [originalPrice, discountAmount, finalPrice],
+      {
+        label: 'Precios',
+        backgroundColor: [
+          'rgba(50, 69, 255, 0.6)',  // Original price
+          'rgba(188, 82, 238, 0.6)',  // Discount amount
+          'rgba(82, 188, 137, 0.6)'   // Final price
+        ],
+        borderColor: [
+          'rgb(50, 69, 255)',
+          'rgb(188, 82, 238)',
+          'rgb(82, 188, 137)'
+        ],
+        showLegend: true
+      }
+    );
+  });
+</script>

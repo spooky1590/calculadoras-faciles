@@ -1,0 +1,171 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-anos-meses-y-dias';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Cómo se calcula la diferencia entre fechas?',
+    answer: 'La diferencia entre fechas se calcula considerando años completos, luego los meses adicionales y finalmente los días restantes. Por ejemplo, entre el 15 de marzo de 2020 y el 20 de junio de 2023 hay 3 años, 3 meses y 5 días.'
+  },
+  {
+    question: '¿Puedo usar esta herramienta para calcular edad?',
+    answer: 'Sí, puedes usar esta calculadora para determinar la edad exacta de una persona. Simplemente ingresa la fecha de nacimiento como fecha inicial y la fecha actual como fecha final.'
+  },
+  {
+    question: '¿Qué pasa si la fecha final es anterior a la inicial?',
+    answer: 'La calculadora detectará esta situación y te mostrará un mensaje indicando que la fecha final debe ser posterior a la fecha inicial para realizar el cálculo correctamente.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Años, Meses y Días" 
+  description="Calcula fácilmente el tiempo transcurrido entre dos fechas en años, meses y días. Útil para edad, plazos o duración de eventos."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Matemáticas y Educación"
+      categoryHref="/#matematicas"
+      currentTitle="Calculadora de Años, Meses y Días"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Años, Meses y Días</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta herramienta te permite calcular con precisión la diferencia entre dos fechas en años, meses y días.
+      Ideal para edad exacta, plazos de tiempo o duración entre eventos.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="dateDifferenceCalculator" class="space-y-6">
+        <div>
+          <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">
+            Fecha de inicio
+          </label>
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="endDate" class="block text-sm font-medium text-gray-700 mb-2">
+            Fecha de fin
+          </label>
+          <input
+            type="date"
+            id="endDate"
+            name="endDate"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular diferencia
+        </button>
+      </form>
+
+      <div id="results" class="mt-6 hidden">
+        <h2 class="text-xl font-semibold mb-4">Resultado:</h2>
+        <div class="space-y-2">
+          <p class="text-gray-700">
+            Años: <span id="years" class="font-bold text-primary"></span>
+          </p>
+          <p class="text-gray-700">
+            Meses: <span id="months" class="font-bold text-primary"></span>
+          </p>
+          <p class="text-gray-700">
+            Días: <span id="days" class="font-bold text-primary"></span>
+          </p>
+        </div>
+      </div>
+
+      <div id="error" class="mt-6 hidden">
+        <p class="text-red-600 font-medium">La fecha final debe ser posterior a la fecha inicial.</p>
+      </div>
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('dateDifferenceCalculator');
+  const results = document.getElementById('results');
+  const error = document.getElementById('error');
+  const yearsElement = document.getElementById('years');
+  const monthsElement = document.getElementById('months');
+  const daysElement = document.getElementById('days');
+
+  function calculateDateDifference(start: Date, end: Date) {
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    let days = end.getDate() - start.getDate();
+
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(end.getFullYear(), end.getMonth(), 0);
+      days += lastMonth.getDate();
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    return { years, months, days };
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const startDateInput = document.getElementById('startDate') as HTMLInputElement;
+    const endDateInput = document.getElementById('endDate') as HTMLInputElement;
+    
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+    
+    if (endDate < startDate) {
+      if (results && error) {
+        results.classList.add('hidden');
+        error.classList.remove('hidden');
+      }
+      return;
+    }
+    
+    const difference = calculateDateDifference(startDate, endDate);
+    
+    if (results && error && yearsElement && monthsElement && daysElement) {
+      error.classList.add('hidden');
+      results.classList.remove('hidden');
+      yearsElement.textContent = difference.years.toString();
+      monthsElement.textContent = difference.months.toString();
+      daysElement.textContent = difference.days.toString();
+    }
+  });
+</script>

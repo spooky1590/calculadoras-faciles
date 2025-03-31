@@ -1,0 +1,301 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorOutput from '../components/CalculatorOutput.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-horas-trabajadas';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const weekDays = [
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+  'Domingo'
+];
+
+const faqs = [
+  {
+    question: '¿Cómo se calcula el total de horas semanales?',
+    answer: 'Se suman todas las horas trabajadas de lunes a domingo, restando el tiempo de comida si está activada esa opción. El cálculo considera los turnos nocturnos correctamente.'
+  },
+  {
+    question: '¿Qué pasa si trabajo turnos nocturnos?',
+    answer: 'La calculadora maneja correctamente los turnos nocturnos. Si la hora de salida es anterior a la hora de entrada, se asume que el turno cruza la medianoche y se calcula correctamente.'
+  },
+  {
+    question: '¿Cómo se calcula el ingreso estimado?',
+    answer: 'El ingreso estimado se calcula multiplicando el total de horas trabajadas por el salario por hora ingresado. Este es un cálculo bruto antes de impuestos o deducciones.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Horas Trabajadas Semanal + Ingreso | CalculadorasFáciles.com"
+  description="Ingresa tus horas de entrada y salida de lunes a domingo y calcula tu salario semanal estimado basado en tu pago por hora."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Trabajo y Finanzas"
+      categoryHref="/#finanzas"
+      currentTitle="Calculadora de Horas Trabajadas"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Horas Trabajadas</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta herramienta te permite calcular tus horas trabajadas semanales y estimar tu ingreso.
+      Ingresa tus horarios de entrada y salida para cada día de la semana.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="workingHoursCalculator" class="space-y-6">
+        <div class="space-y-4">
+          {weekDays.map(day => (
+            <div class="day-row border-b pb-4 last:border-0">
+              <div class="flex items-center gap-4">
+                <div class="w-24">
+                  <span class="text-sm font-medium text-gray-700">{day}</span>
+                </div>
+                <div class="flex-1 grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Entrada
+                    </label>
+                    <input
+                      type="time"
+                      name={`start-${day.toLowerCase()}`}
+                      class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Salida
+                    </label>
+                    <input
+                      type="time"
+                      name={`end-${day.toLowerCase()}`}
+                      class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="deductLunch"
+            class="rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          <label for="deductLunch" class="text-sm font-medium text-gray-700">
+            ¿Restar tiempo de comida?
+          </label>
+          <input
+            type="number"
+            id="lunchMinutes"
+            min="0"
+            max="180"
+            value="60"
+            class="ml-2 w-20 px-2 py-1 rounded border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500"
+            disabled
+          />
+          <span class="text-sm text-gray-600">minutos por día</span>
+        </div>
+
+        <div>
+          <label for="hourlyRate" class="block text-sm font-medium text-gray-700 mb-2">
+            Salario por hora
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+            <input
+              type="number"
+              id="hourlyRate"
+              name="hourlyRate"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular horas e ingreso
+        </button>
+      </form>
+
+      <CalculatorOutput showChart={true} />
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('workingHoursCalculator');
+  const deductLunchCheckbox = document.getElementById('deductLunch') as HTMLInputElement;
+  const lunchMinutesInput = document.getElementById('lunchMinutes') as HTMLInputElement;
+
+  // Enable/disable lunch minutes input based on checkbox
+  deductLunchCheckbox?.addEventListener('change', () => {
+    if (lunchMinutesInput) {
+      lunchMinutesInput.disabled = !deductLunchCheckbox.checked;
+    }
+  });
+
+  function calculateTimeDifference(startTime: string, endTime: string): number {
+    if (!startTime || !endTime) return 0;
+    
+    const start = new Date(`2000/01/01 ${startTime}`);
+    let end = new Date(`2000/01/01 ${endTime}`);
+    
+    // If end time is before start time, assume it's the next day
+    if (end < start) {
+      end = new Date(`2000/01/02 ${endTime}`);
+    }
+    
+    return (end.getTime() - start.getTime()) / (1000 * 60); // Return minutes
+  }
+
+  function formatTime(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}:${mins.toString().padStart(2, '0')}`;
+  }
+
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(amount);
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const weekDays = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    const dailyMinutes: number[] = [];
+    let totalMinutes = 0;
+    
+    weekDays.forEach(day => {
+      const startInput = document.querySelector(`[name="start-${day}"]`) as HTMLInputElement;
+      const endInput = document.querySelector(`[name="end-${day}"]`) as HTMLInputElement;
+      
+      const minutes = calculateTimeDifference(startInput?.value || '', endInput?.value || '');
+      dailyMinutes.push(minutes);
+      totalMinutes += minutes;
+    });
+    
+    // Deduct lunch time if checked
+    let totalLunchMinutes = 0;
+    if (deductLunchCheckbox?.checked) {
+      const lunchMinutes = parseInt(lunchMinutesInput?.value || '0');
+      const workDays = dailyMinutes.filter(minutes => minutes > 0).length;
+      totalLunchMinutes = lunchMinutes * workDays;
+      totalMinutes -= totalLunchMinutes;
+    }
+    
+    // Calculate estimated income
+    const hourlyRateInput = document.getElementById('hourlyRate') as HTMLInputElement;
+    const hourlyRate = parseFloat(hourlyRateInput?.value || '0');
+    const totalHours = totalMinutes / 60;
+    const estimatedIncome = totalHours * hourlyRate;
+    
+    // Update text results
+    window.calculatorOutput.setText(`
+      <div class="space-y-4">
+        <div class="p-4 bg-primary/10 rounded-lg">
+          <h3 class="text-lg font-semibold text-primary mb-2">Resumen Semanal</h3>
+          <p class="text-2xl font-bold text-primary">${formatTime(totalMinutes)} horas totales</p>
+          <p class="text-lg text-primary/80">Promedio diario: ${formatTime(totalMinutes / 7)} horas</p>
+        </div>
+        
+        ${deductLunchCheckbox?.checked ? `
+          <div class="p-4 bg-secondary/10 rounded-lg">
+            <h3 class="text-lg font-semibold text-secondary mb-2">Tiempo de Comida Total</h3>
+            <p class="text-xl font-bold text-secondary">${formatTime(totalLunchMinutes)} horas</p>
+          </div>
+        ` : ''}
+        
+        ${hourlyRate > 0 ? `
+          <div class="p-4 bg-green-50 rounded-lg">
+            <h3 class="text-lg font-semibold text-green-700 mb-2">Ingreso Estimado</h3>
+            <p class="text-2xl font-bold text-green-700">${formatCurrency(estimatedIncome)}</p>
+            <p class="text-sm text-green-600">Basado en ${formatCurrency(hourlyRate)}/hora</p>
+          </div>
+        ` : ''}
+        
+        <div class="mt-4">
+          <h4 class="font-medium text-gray-700 mb-2">Desglose por Día:</h4>
+          <ul class="space-y-1">
+            ${weekDays.map((day, index) => `
+              <li class="text-gray-600">
+                ${day.charAt(0).toUpperCase() + day.slice(1)}: 
+                <span class="font-medium">${formatTime(dailyMinutes[index])} horas</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    `);
+
+    // Render bar chart
+    window.calculatorOutput.renderBarChart(
+      weekDays.map(day => day.charAt(0).toUpperCase() + day.slice(1)),
+      dailyMinutes.map(minutes => minutes / 60), // Convert to hours for display
+      {
+        label: 'Horas por Día',
+        backgroundColor: 'rgba(50, 69, 255, 0.6)',
+        borderColor: 'rgb(50, 69, 255)',
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Horas'
+            }
+          }
+        }
+      }
+    );
+  });
+</script>

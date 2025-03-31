@@ -1,0 +1,193 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorOutput from '../components/CalculatorOutput.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-notas';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Cómo se calcula el promedio?',
+    answer: 'El promedio se calcula sumando todas las notas y dividiendo el resultado entre el número total de notas. Por ejemplo, si tienes tres notas: 8, 7 y 9, el promedio sería (8 + 7 + 9) ÷ 3 = 8.'
+  },
+  {
+    question: '¿Qué representa el gráfico de barras?',
+    answer: 'El gráfico de barras muestra visualmente todas tus notas, permitiéndote comparar fácilmente las calificaciones entre sí y ver cuáles están por encima o por debajo del promedio.'
+  },
+  {
+    question: '¿Puedo ingresar notas decimales?',
+    answer: 'Sí, puedes ingresar notas con decimales (por ejemplo, 7.5 o 8.75) para un cálculo más preciso de tu promedio.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Notas con Gráfico" 
+  description="Calcula tu promedio y visualiza tus calificaciones con un gráfico de barras. Ideal para estudiantes que quieren ver su rendimiento."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Matemáticas y Educación"
+      categoryHref="/#matematicas"
+      currentTitle="Calculadora de Notas"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Notas</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta herramienta te ayuda a calcular el promedio de tus notas y ver cada calificación en un gráfico visual.
+      Ideal para estudiantes y docentes.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="gradesCalculator" class="space-y-6">
+        <div id="gradesContainer" class="space-y-4">
+          <div class="grade-input">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Nota 1
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="10"
+              step="0.01"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="addGrade"
+          class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+        >
+          Agregar otra nota
+        </button>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular promedio
+        </button>
+      </form>
+
+      <CalculatorOutput showChart={true} />
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('gradesCalculator');
+  const addGradeButton = document.getElementById('addGrade');
+  const gradesContainer = document.getElementById('gradesContainer');
+  
+  let gradeCount = 1;
+
+  addGradeButton?.addEventListener('click', () => {
+    gradeCount++;
+    const newGradeDiv = document.createElement('div');
+    newGradeDiv.className = 'grade-input';
+    newGradeDiv.innerHTML = `
+      <div class="flex items-center gap-2">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Nota ${gradeCount}
+          </label>
+          <input
+            type="number"
+            min="0"
+            max="10"
+            step="0.01"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+        <button
+          type="button"
+          class="remove-grade mt-6 text-red-500 hover:text-red-700"
+          aria-label="Eliminar nota"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    `;
+
+    gradesContainer?.appendChild(newGradeDiv);
+
+    const removeButton = newGradeDiv.querySelector('.remove-grade');
+    removeButton?.addEventListener('click', () => {
+      newGradeDiv.remove();
+    });
+  });
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const inputs = document.querySelectorAll('.grade-input input') as NodeListOf<HTMLInputElement>;
+    const grades = Array.from(inputs).map(input => parseFloat(input.value));
+    
+    const sum = grades.reduce((acc, grade) => acc + grade, 0);
+    const average = sum / grades.length;
+    
+    // Update results using the new component
+    window.calculatorOutput.setText(`
+      <p class="text-gray-700">
+        Promedio: <span class="text-2xl font-bold text-primary">${average.toFixed(2)}</span>
+      </p>
+      <p class="text-gray-700">
+        Total de notas: <span class="font-bold text-primary">${grades.length}</span>
+      </p>
+    `);
+    
+    // Render the chart
+    window.calculatorOutput.renderBarChart(
+      grades.map((_, index) => `Nota ${index + 1}`),
+      grades,
+      {
+        label: 'Calificaciones',
+        scales: {
+          y: {
+            max: 10
+          }
+        }
+      }
+    );
+  });
+</script>

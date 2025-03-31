@@ -1,0 +1,202 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-finiquito';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Qué es el finiquito?',
+    answer: 'El finiquito es la liquidación final que recibe un trabajador al terminar su relación laboral. Incluye el pago de los últimos días trabajados, vacaciones no disfrutadas, parte proporcional del aguinaldo y otros conceptos pendientes.'
+  },
+  {
+    question: '¿Qué se incluye en el cálculo del finiquito?',
+    answer: 'El cálculo básico incluye los días trabajados pendientes de pago, las vacaciones no disfrutadas y la parte proporcional del aguinaldo. Pueden existir otros conceptos según el caso específico y la legislación local.'
+  },
+  {
+    question: '¿Esta calculadora aplica a todos los países?',
+    answer: 'Esta es una calculadora básica que considera los elementos más comunes del finiquito. Las regulaciones específicas varían según el país y la región, por lo que te recomendamos consultar la legislación local o un profesional para casos específicos.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Finiquito" 
+  description="Calcula fácilmente el monto de tu finiquito con esta herramienta sencilla. Considera días trabajados, vacaciones no usadas y aguinaldo proporcional."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Trabajo y Finanzas"
+      categoryHref="/#finanzas"
+      currentTitle="Calculadora de Finiquito"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Finiquito</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta calculadora te ayuda a estimar el monto de tu finiquito laboral de manera sencilla.
+      Ingresa los datos solicitados para obtener un cálculo aproximado de tu liquidación final,
+      incluyendo días trabajados, vacaciones pendientes y aguinaldo proporcional.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="severanceCalculator" class="space-y-6">
+        <div>
+          <label for="workedDays" class="block text-sm font-medium text-gray-700 mb-2">
+            Días trabajados
+          </label>
+          <input
+            type="number"
+            id="workedDays"
+            name="workedDays"
+            min="0"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="dailySalary" class="block text-sm font-medium text-gray-700 mb-2">
+            Salario diario
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+            <input
+              type="number"
+              id="dailySalary"
+              name="dailySalary"
+              min="0"
+              step="0.01"
+              class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="unusedVacationDays" class="block text-sm font-medium text-gray-700 mb-2">
+            Días de vacaciones no utilizados
+          </label>
+          <input
+            type="number"
+            id="unusedVacationDays"
+            name="unusedVacationDays"
+            min="0"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="christmasBonus" class="block text-sm font-medium text-gray-700 mb-2">
+            Aguinaldo proporcional en días
+          </label>
+          <input
+            type="number"
+            id="christmasBonus"
+            name="christmasBonus"
+            min="0"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular finiquito
+        </button>
+      </form>
+
+      <div id="results" class="mt-6 hidden">
+        <h2 class="text-xl font-semibold mb-4">Resultados del cálculo:</h2>
+        <div class="space-y-3">
+          <p class="text-gray-700">
+            Pago por días trabajados: <span id="workedDaysAmount" class="font-bold text-primary"></span>
+          </p>
+          <p class="text-gray-700">
+            Pago por vacaciones: <span id="vacationAmount" class="font-bold text-primary"></span>
+          </p>
+          <p class="text-gray-700">
+            Aguinaldo proporcional: <span id="bonusAmount" class="font-bold text-primary"></span>
+          </p>
+          <div class="border-t pt-3 mt-3">
+            <p class="text-gray-900">
+              Total del finiquito: <span id="totalAmount" class="text-2xl font-bold text-primary"></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('severanceCalculator');
+  const results = document.getElementById('results');
+  const workedDaysAmountElement = document.getElementById('workedDaysAmount');
+  const vacationAmountElement = document.getElementById('vacationAmount');
+  const bonusAmountElement = document.getElementById('bonusAmount');
+  const totalAmountElement = document.getElementById('totalAmount');
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const workedDaysInput = document.getElementById('workedDays') as HTMLInputElement;
+    const dailySalaryInput = document.getElementById('dailySalary') as HTMLInputElement;
+    const unusedVacationDaysInput = document.getElementById('unusedVacationDays') as HTMLInputElement;
+    const christmasBonusInput = document.getElementById('christmasBonus') as HTMLInputElement;
+    
+    const workedDays = parseInt(workedDaysInput.value);
+    const dailySalary = parseFloat(dailySalaryInput.value);
+    const unusedVacationDays = parseInt(unusedVacationDaysInput.value);
+    const christmasBonus = parseInt(christmasBonusInput.value);
+    
+    const workedDaysAmount = workedDays * dailySalary;
+    const vacationAmount = unusedVacationDays * dailySalary;
+    const bonusAmount = christmasBonus * dailySalary;
+    const totalAmount = workedDaysAmount + vacationAmount + bonusAmount;
+    
+    if (results && workedDaysAmountElement && vacationAmountElement && bonusAmountElement && totalAmountElement) {
+      results.classList.remove('hidden');
+      workedDaysAmountElement.textContent = `${workedDaysAmount.toFixed(2)} €`;
+      vacationAmountElement.textContent = `${vacationAmount.toFixed(2)} €`;
+      bonusAmountElement.textContent = `${bonusAmount.toFixed(2)} €`;
+      totalAmountElement.textContent = `${totalAmount.toFixed(2)} €`;
+    }
+  });
+</script>

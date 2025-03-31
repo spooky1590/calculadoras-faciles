@@ -1,0 +1,354 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorOutput from '../components/CalculatorOutput.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-interes-compuesto';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Qué es el interés compuesto?',
+    answer: 'El interés compuesto es el interés que se genera sobre el capital inicial más los intereses acumulados de períodos anteriores. Es decir, los intereses se reinvierten para generar más intereses, creando un efecto de "bola de nieve" que acelera el crecimiento de la inversión.'
+  },
+  {
+    question: '¿Con qué frecuencia se recomienda capitalizar?',
+    answer: 'Generalmente, cuanto más frecuente sea la capitalización, mayor será el rendimiento final. La capitalización mensual es común en muchos productos financieros, aunque algunos ofrecen capitalización diaria para maximizar los rendimientos.'
+  },
+  {
+    question: '¿Cuál es la diferencia entre interés simple y compuesto?',
+    answer: 'El interés simple se calcula solo sobre el capital inicial, mientras que el interés compuesto se calcula sobre el capital más los intereses acumulados. A largo plazo, el interés compuesto genera rendimientos significativamente mayores.'
+  }
+];
+
+const capitalizationOptions = [
+  { value: '12', label: 'Mensual' },
+  { value: '4', label: 'Trimestral' },
+  { value: '2', label: 'Semestral' },
+  { value: '1', label: 'Anual' },
+  { value: '365', label: 'Diario' }
+];
+---
+
+<Layout 
+  title="Calculadora de Interés Compuesto | Calcula tus inversiones"
+  description="Calcula el crecimiento de tu inversión con interés compuesto. Incluye tablas, gráficos y aportes mensuales. Herramienta gratuita y confiable."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Trabajo y Finanzas"
+      categoryHref="/#finanzas"
+      currentTitle="Calculadora de Interés Compuesto"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Interés Compuesto</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta calculadora te ayuda a proyectar el crecimiento de tus inversiones considerando el poder del interés compuesto.
+      Incluye aportes mensuales y ajuste por inflación para una planificación financiera más precisa.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="compoundInterestCalculator" class="space-y-6">
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="initialInvestment" class="block text-sm font-medium text-gray-700 mb-2">
+              Inversión inicial
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+              <input
+                type="number"
+                id="initialInvestment"
+                name="initialInvestment"
+                min="0"
+                step="0.01"
+                class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="monthlyContribution" class="block text-sm font-medium text-gray-700 mb-2">
+              Aporte mensual
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+              <input
+                type="number"
+                id="monthlyContribution"
+                name="monthlyContribution"
+                min="0"
+                step="0.01"
+                class="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="interestRate" class="block text-sm font-medium text-gray-700 mb-2">
+              Tasa de interés anual (%)
+            </label>
+            <div class="relative">
+              <input
+                type="number"
+                id="interestRate"
+                name="interestRate"
+                min="0"
+                max="100"
+                step="0.01"
+                value="8"
+                class="w-full pr-8 pl-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+                required
+              />
+              <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="years" class="block text-sm font-medium text-gray-700 mb-2">
+              Número de años
+            </label>
+            <input
+              type="number"
+              id="years"
+              name="years"
+              min="1"
+              max="50"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="capitalization" class="block text-sm font-medium text-gray-700 mb-2">
+              Frecuencia de capitalización
+            </label>
+            <select
+              id="capitalization"
+              name="capitalization"
+              class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
+            >
+              {capitalizationOptions.map(option => (
+                <option value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="includeInflation"
+                class="rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label for="includeInflation" class="ml-2 text-sm font-medium text-gray-700">
+                ¿Incluir inflación?
+              </label>
+            </div>
+            <div class="flex-1">
+              <input
+                type="number"
+                id="inflationRate"
+                min="0"
+                max="100"
+                step="0.01"
+                value="2"
+                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-gray-100"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular interés compuesto
+        </button>
+      </form>
+
+      <CalculatorOutput showChart={true} />
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('compoundInterestCalculator');
+  const inflationCheckbox = document.getElementById('includeInflation') as HTMLInputElement;
+  const inflationInput = document.getElementById('inflationRate') as HTMLInputElement;
+
+  inflationCheckbox?.addEventListener('change', () => {
+    if (inflationInput) {
+      inflationInput.disabled = !inflationCheckbox.checked;
+    }
+  });
+
+  function formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 2
+    }).format(amount);
+  }
+
+  function calculateCompoundInterest(
+    principal: number,
+    monthlyContribution: number,
+    rate: number,
+    years: number,
+    capitalizationFrequency: number,
+    inflationRate: number = 0
+  ) {
+    const results = [];
+    let totalContributed = principal;
+    let previousYearTotal = principal;
+    
+    const effectiveRate = (1 + rate / 100) ** (1 / capitalizationFrequency) - 1;
+    const monthlyRate = effectiveRate * 12 / capitalizationFrequency;
+    
+    for (let year = 1; year <= years; year++) {
+      const yearlyContribution = monthlyContribution * 12;
+      totalContributed += yearlyContribution;
+      
+      let total = previousYearTotal;
+      for (let period = 0; period < capitalizationFrequency; period++) {
+        const monthsInPeriod = 12 / capitalizationFrequency;
+        const contributionInPeriod = monthlyContribution * monthsInPeriod;
+        total = (total + contributionInPeriod) * (1 + effectiveRate);
+      }
+      
+      const interestEarned = total - previousYearTotal - yearlyContribution;
+      
+      if (inflationRate > 0) {
+        total /= (1 + inflationRate / 100);
+        previousYearTotal /= (1 + inflationRate / 100);
+      }
+      
+      results.push({
+        year,
+        initialBalance: previousYearTotal,
+        yearlyContribution,
+        interestEarned,
+        total
+      });
+      
+      previousYearTotal = total;
+    }
+    
+    return {
+      results,
+      totalContributed,
+      totalInterest: previousYearTotal - totalContributed
+    };
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const initialInvestment = parseFloat((document.getElementById('initialInvestment') as HTMLInputElement).value);
+    const monthlyContribution = parseFloat((document.getElementById('monthlyContribution') as HTMLInputElement).value);
+    const interestRate = parseFloat((document.getElementById('interestRate') as HTMLInputElement).value);
+    const years = parseInt((document.getElementById('years') as HTMLInputElement).value);
+    const capitalization = parseInt((document.getElementById('capitalization') as HTMLSelectElement).value);
+    const inflationRate = inflationCheckbox?.checked ?  parseFloat(inflationInput?.value || '0') : 0;
+    
+    const { results, totalContributed, totalInterest } = calculateCompoundInterest(
+      initialInvestment,
+      monthlyContribution,
+      interestRate,
+      years,
+      capitalization,
+      inflationRate
+    );
+    
+    const finalAmount = results[results.length - 1].total;
+    const totalDeposits = totalContributed - initialInvestment;
+
+    window.calculatorOutput.setText(`
+      <div class="text-center mb-8">
+        <h3 class="text-4xl font-bold text-gray-900 mb-2">
+          Puedes ahorrar ${formatCurrency(finalAmount)}
+        </h3>
+        <p class="text-xl text-gray-600">
+          ahorrando ${formatCurrency(monthlyContribution)} mensual durante ${years} años
+        </p>
+        ${inflationRate > 0 ? `
+          <p class="text-sm text-gray-500 mt-2">
+            (Valores ajustados por inflación del ${inflationRate}% anual)
+          </p>
+        ` : ''}
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 text-center">
+        <div class="p-4 bg-purple-50 rounded-lg">
+          <h4 class="text-sm font-medium text-purple-900 uppercase mb-2">Balance inicial</h4>
+          <p class="text-2xl font-bold text-purple-700">${formatCurrency(initialInvestment)}</p>
+        </div>
+        <div class="p-4 bg-blue-50 rounded-lg">
+          <h4 class="text-sm font-medium text-blue-900 uppercase mb-2">Depósitos periódicos</h4>
+          <p class="text-2xl font-bold text-blue-700">${formatCurrency(totalDeposits)}</p>
+        </div>
+        <div class="p-4 bg-green-50 rounded-lg">
+          <h4 class="text-sm font-medium text-green-900 uppercase mb-2">Interés total</h4>
+          <p class="text-2xl font-bold text-green-700">${formatCurrency(totalInterest)}</p>
+        </div>
+      </div>
+    `);
+
+    const chartData = {
+      labels: ['Balance inicial', 'Depósitos periódicos', 'Interés total'],
+      values: [initialInvestment, totalDeposits, totalInterest],
+      yearLabels: results.map(r => `Año ${r.year}`),
+      yearlyData: [
+        {
+          label: 'Balance inicial',
+          data: results.map(() => initialInvestment)
+        },
+        {
+          label: 'Depósitos periódicos',
+          data: results.map((r, i) => r.yearlyContribution * (i + 1))
+        },
+        {
+          label: 'Interés',
+          data: results.map(r => r.total - initialInvestment - (r.yearlyContribution * r.year))
+        }
+      ],
+      colors: {
+        background: [
+          'rgba(168, 85, 247, 0.6)',
+          'rgba(59, 130, 246, 0.6)',
+          'rgba(34, 197, 94, 0.6)'
+        ],
+        border: [
+          'rgb(168, 85, 247)',
+          'rgb(59, 130, 246)',
+          'rgb(34, 197, 94)'
+        ]
+      }
+    };
+
+    window.calculatorOutput.renderCharts(chartData);
+  });
+</script>

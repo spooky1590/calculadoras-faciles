@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://calculadorasfaciles.com/sitemap.xml

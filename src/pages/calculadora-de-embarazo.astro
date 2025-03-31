@@ -1,0 +1,267 @@
+import Layout from '../layouts/Layout.astro';
+import CalculatorOutput from '../components/CalculatorOutput.astro';
+import RelatedCalculators from '../components/RelatedCalculators.astro';
+import { getRelatedCalculators } from '../utils/getRelatedCalculators';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+// Define current calculator for related calculators functionality
+const currentCalculator = '/calculadora-de-embarazo';
+const relatedCalculators = getRelatedCalculators(currentCalculator);
+
+const faqs = [
+  {
+    question: '¿Qué tan precisa es esta calculadora?',
+    answer: 'Esta calculadora utiliza el método estándar médico (regla de Naegele) para estimar la fecha de parto. Sin embargo, solo el 5% de los bebés nacen exactamente en la fecha calculada. La mayoría nace en un rango de dos semanas antes o después de esta fecha.'
+  },
+  {
+    question: '¿Qué debo hacer si mis ciclos son irregulares?',
+    answer: 'Si tus ciclos son irregulares, esta calculadora puede ser menos precisa. En este caso, es especialmente importante consultar con tu médico temprano en el embarazo. Una ecografía en el primer trimestre puede proporcionar una fecha más exacta.'
+  },
+  {
+    question: '¿Cuándo debo visitar a un médico?',
+    answer: 'Se recomienda programar tu primera visita prenatal tan pronto confirmes tu embarazo, idealmente antes de la semana 8. Si tienes condiciones médicas preexistentes o síntomas preocupantes, debes buscar atención médica de inmediato.'
+  }
+];
+
+const trimestres = [
+  {
+    nombre: 'Primer Trimestre',
+    semanas: '1-13',
+    descripcion: 'Desarrollo de órganos principales y sistemas corporales básicos.'
+  },
+  {
+    nombre: 'Segundo Trimestre',
+    semanas: '14-27',
+    descripcion: 'Crecimiento rápido y desarrollo de características físicas.'
+  },
+  {
+    nombre: 'Tercer Trimestre',
+    semanas: '28-40',
+    descripcion: 'Maduración final de órganos y aumento de peso significativo.'
+  }
+];
+---
+
+<Layout 
+  title="Calculadora de Embarazo – Fecha de parto y semanas | CalculadorasFáciles.com"
+  description="Calcula tu fecha estimada de parto y conoce cuántas semanas de embarazo tienes. Basado en tu última menstruación. Gratis y confiable."
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs 
+      categoryTitle="Embarazo y Fertilidad"
+      categoryHref="/#embarazo"
+      currentTitle="Calculadora de Embarazo"
+    />
+
+    <h1 class="text-4xl font-bold mb-6">Calculadora de Embarazo</h1>
+    
+    <p class="text-lg text-gray-700 mb-8">
+      Esta herramienta te ayuda a calcular la fecha estimada de parto a partir de la fecha de la última menstruación.
+      Ideal para futuras mamás que desean conocer el avance de su embarazo.
+    </p>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="pregnancyCalculator" class="space-y-6">
+        <div>
+          <label for="lastPeriod" class="block text-sm font-medium text-gray-700 mb-2">
+            Fecha de la última menstruación
+          </label>
+          <input
+            type="date"
+            id="lastPeriod"
+            name="lastPeriod"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity"
+        >
+          Calcular fecha de parto
+        </button>
+      </form>
+
+      <CalculatorOutput showChart={false} />
+
+      <!-- Share buttons -->
+      <div class="mt-6 flex gap-4 justify-center">
+        <button
+          id="shareWhatsApp"
+          class="flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white rounded-lg hover:bg-opacity-90"
+        >
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Compartir
+        </button>
+        <button
+          id="shareFacebook"
+          class="flex items-center gap-2 px-4 py-2 bg-[#1877F2] text-white rounded-lg hover:bg-opacity-90"
+        >
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Compartir
+        </button>
+      </div>
+    </div>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-6">Información sobre el Embarazo</h2>
+      
+      <div class="space-y-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-xl font-semibold mb-4">¿Cómo se calcula la fecha estimada de parto?</h3>
+          <p class="text-gray-700">
+            La fecha estimada de parto se calcula utilizando la regla de Naegele: se suma 280 días (40 semanas) 
+            a la fecha del primer día de la última menstruación. Este método asume un ciclo menstrual regular 
+            de 28 días y una ovulación en el día 14.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-xl font-semibold mb-4">¿Qué es la edad gestacional?</h3>
+          <p class="text-gray-700">
+            La edad gestacional es la forma en que los profesionales médicos miden la duración del embarazo. 
+            Se calcula desde el primer día de la última menstruación, no desde el momento de la concepción. 
+            Por esta razón, cuando se confirma un embarazo, ya se consideran aproximadamente 4 semanas de gestación.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-xl font-semibold mb-4">¿Cuál es la diferencia entre edad gestacional y edad fetal?</h3>
+          <p class="text-gray-700">
+            La edad gestacional se cuenta desde el primer día de la última menstruación, mientras que la edad fetal 
+            se cuenta desde el momento de la concepción. La edad fetal es aproximadamente dos semanas menos que la 
+            edad gestacional, ya que la fertilización ocurre alrededor de dos semanas después del inicio del último período.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-6">Etapas del Embarazo</h2>
+      
+      <div class="grid gap-6 md:grid-cols-3">
+        {trimestres.map(trimestre => (
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-primary mb-2">{trimestre.nombre}</h3>
+            <p class="text-lg font-medium text-secondary mb-2">Semanas {trimestre.semanas}</p>
+            <p class="text-gray-700">{trimestre.descripcion}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">Preguntas Frecuentes</h2>
+      <div class="space-y-4">
+        {faqs.map(faq => (
+          <details class="bg-gray-50 rounded-lg p-4">
+            <summary class="font-medium cursor-pointer">{faq.question}</summary>
+            <p class="mt-2 text-gray-600">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedCalculators calculators={relatedCalculators} />
+
+    {faqs.length > 0 && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      })} />
+    )}
+  </article>
+</Layout>
+
+<script>
+  const form = document.getElementById('pregnancyCalculator');
+  const shareWhatsAppBtn = document.getElementById('shareWhatsApp');
+  const shareFacebookBtn = document.getElementById('shareFacebook');
+
+  function calculateDueDate(lastPeriodDate: Date): Date {
+    const dueDate = new Date(lastPeriodDate);
+    dueDate.setDate(dueDate.getDate() + 280); // Add 280 days (40 weeks)
+    return dueDate;
+  }
+
+  function calculateGestationalAge(lastPeriodDate: Date): { weeks: number; days: number } {
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - lastPeriodDate.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    const weeks = Math.floor(diffDays / 7);
+    const days = diffDays % 7;
+    
+    return { weeks, days };
+  }
+
+  function formatDate(date: Date): string {
+    return date.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  function shareOnWhatsApp(text: string) {
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+  }
+
+  function shareOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const lastPeriodInput = document.getElementById('lastPeriod') as HTMLInputElement;
+    const lastPeriodDate = new Date(lastPeriodInput.value);
+    
+    const dueDate = calculateDueDate(lastPeriodDate);
+    const gestationalAge = calculateGestationalAge(lastPeriodDate);
+    
+    // Update text results
+    window.calculatorOutput.setText(`
+      <div class="space-y-4">
+        <div class="p-4 bg-primary/10 rounded-lg">
+          <h3 class="text-lg font-semibold text-primary mb-2">Fecha Probable de Parto</h3>
+          <p class="text-2xl font-bold text-primary">${formatDate(dueDate)}</p>
+        </div>
+        
+        <div class="p-4 bg-secondary/10 rounded-lg">
+          <h3 class="text-lg font-semibold text-secondary mb-2">Edad Gestacional Actual</h3>
+          <p class="text-2xl font-bold text-secondary">
+            ${gestationalAge.weeks} semanas y ${gestationalAge.days} días
+          </p>
+        </div>
+        
+        <p class="text-sm text-gray-600 mt-4">
+          * Esta es una estimación basada en un embarazo promedio de 40 semanas.
+          Consulta con tu profesional de salud para un seguimiento personalizado.
+        </p>
+      </div>
+    `);
+
+    // Update share buttons text
+    const shareText = `¡Mi fecha probable de parto es el ${formatDate(dueDate)}! Calculado con CalculadorasFáciles.com`;
+    
+    shareWhatsAppBtn?.addEventListener('click', () => shareOnWhatsApp(shareText));
+    shareFacebookBtn?.addEventListener('click', () => shareOnFacebook());
+  });
+</script>
